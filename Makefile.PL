@@ -6,6 +6,10 @@ WriteMakefile
           'INSTALLDIRS' => 'site',
           'NAME' => 'DateTime::Calendar::Discordian',
           'VERSION_FROM' => 'lib/DateTime/Calendar/Discordian.pm',
-          'PREREQ_PM' => {}
+          'PREREQ_PM' => {
+                           'DateTime::Locale' => 0,
+                           'DateTime' => 0,
+                           'Params::Validate' => 0
+                         }
         )
 ;

@@ -6,7 +6,7 @@ use Carp;
 use DateTime::Locale;
 use Params::Validate qw( validate SCALAR OBJECT UNDEF);
 
-our $VERSION = '0.8';
+our $VERSION = '0.9.0';
 
 our @days = (
   { name => 'Sweetmorn', abbrev => 'SM', },
@@ -179,13 +179,16 @@ sub from_object
 
   my ($day, $season, $year) = $class->_rd2discordian($rd_days);
 
-  return $class->new(day         => $day, 
-                     season      => $season,
-                     year        => $year,
-                     rd_secs     => $rd_secs || 0,
-                     rd_nanosecs => $rd_nanosecs || 0, 
-                     locale      => $args{locale},
-                    );
+  my $newobj = $class->new(day         => $day, 
+                           season      => $season,
+                           year        => $year,
+                          );
+ 
+  $newobj->{rd_secs}     = $rd_secs || 0;
+  $newobj->{rd_nanosecs} = $rd_nanosecs || 0;
+  $newobj->{locale}      = $args{locale};
+ 
+  return $newobj;
 }
 
 sub holyday
@@ -350,7 +353,7 @@ DateTime::Calendar::Discordian - Perl extension for the Discordian Calendar
 =head1 ABSTRACT
 
 A module that implements the Discordian calendar made popular(?) in the
-"Illuminatus!" trilogy by Robert shea and Robert Anton Wilson and by the
+"Illuminatus!" trilogy by Robert Shea and Robert Anton Wilson and by the
 Church of the SubGenius.
 
 =head1 DESCRIPTION
@@ -410,10 +413,8 @@ YOLD.
 =item B<new>
 
 Constructs a new I<DateTime::Calendar::Discordian> object.  This class
-method requires the parameters I<day>, I<season>, and I<year>.  The
-parameters I<rd_secs>, I<rd_nanosecs>. and I<locale> are also accepted
-for compatability with other I<DateTime> modules but they are not used. 
-If I<day> is given as "St. Tib's Day" (or reasonable facsimile thereof,)
+method requires the parameters I<day>, I<season>, and I<year>.  If
+I<day> is given as "St. Tib's Day" (or reasonable facsimile thereof,)
 then I<season> is omitted. This function will C<die> if invalid
 parameters are given.  For example:
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension DateTime::Calendar::Discordian.
 
+0.9.1 Sat Jun 12 13:55:00 2004
+        - Uploaded to Debian and CPAN.
+
 0.9.0 Fri Jun 11 16:19:00 2004
         - At Dave Rolskys suggestion, days_till_x renamed to days_until_x
         - Constructor doesn't take rd_secs, rd_nanosecs, or locale parameters.

@@ -6,7 +6,7 @@ use Carp;
 use DateTime::Locale;
 use Params::Validate qw( validate SCALAR OBJECT UNDEF);
 
-our $VERSION = '0.9.0';
+our $VERSION = '0.9.1';
 
 our @days = (
   { name => 'Sweetmorn', abbrev => 'SM', },

@@ -1,8 +1,7 @@
 --- #YAML:1.0
 name: DateTime-Calendar-Discordian
-version: 0.9.1
-author:
-  - Jaldhar H. Vyas <jaldhar@braincells.com>
+version: 0.9.2
+author: Jaldhar H. Vyas <jaldhar@braincells.com>
 abstract: Perl extension for the Discordian Calendar
 license: perl
 requires:
@@ -12,5 +11,5 @@ requires:
 provides:
   DateTime::Calendar::Discordian:
     file: lib/DateTime/Calendar/Discordian.pm
-    version: 0.9.1
-generated_by: Module::Build version 0.24
+    version: 0.9.2
+generated_by: Module::Build version 0.25

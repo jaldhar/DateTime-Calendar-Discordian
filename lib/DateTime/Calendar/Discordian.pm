@@ -6,7 +6,7 @@ use Carp;
 use DateTime::Locale;
 use Params::Validate qw( validate SCALAR OBJECT UNDEF);
 
-our $VERSION = '0.9.1';
+our $VERSION = '0.9.2';
 
 our @days = (
   { name => 'Sweetmorn', abbrev => 'SM', },
@@ -279,7 +279,7 @@ sub _discordian2rd
   $rd += $day_of_year;
 
   # add 1 if this is a leap year and it is past St. Tibs' Day.
-  $rd += $day_of_year < 60 ? 0 : _is_leap_year($yr + 1) ? 1 : 0;
+  $rd += $day_of_year <= 60 ? 0 : _is_leap_year($yr + 1) ? 1 : 0;
 
   return $rd;
 }

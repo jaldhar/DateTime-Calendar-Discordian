@@ -1,3 +1,10 @@
+libdatetime-calendar-discordian-perl (0.9.2) unstable; urgency=low
+
+  * New upstream version.  Fixes off by one error in conversion of 
+    St. Tib's Day to RD date. (Closes: #275172)
+
+ -- Jaldhar H. Vyas <jaldhar@debian.org>  Wed,  6 Oct 2004 16:00:51 -0400
+
 libdatetime-calendar-discordian-perl (0.9.1) unstable; urgency=low
 
   * Initial upload to Debian.  (Closes: #254046)

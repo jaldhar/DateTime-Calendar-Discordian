@@ -2,14 +2,14 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-          'PL_FILES' => {},
-          'INSTALLDIRS' => 'site',
           'NAME' => 'DateTime::Calendar::Discordian',
           'VERSION_FROM' => 'lib/DateTime/Calendar/Discordian.pm',
           'PREREQ_PM' => {
-                           'DateTime::Locale' => 0,
-                           'DateTime' => 0,
-                           'Params::Validate' => 0
-                         }
+                           'DateTime' => '0',
+                           'DateTime::Locale' => '0',
+                           'Params::Validate' => '0'
+                         },
+          'INSTALLDIRS' => 'site',
+          'PL_FILES' => {}
         )
 ;

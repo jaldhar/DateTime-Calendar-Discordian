@@ -1,0 +1,26 @@
+This is the debian package for the DateTime::Calendar::Discordian module.
+It was created by Jaldhar H. Vyas <jaldhar@debian.org> using dh-make-perl.
+
+The upstream author is: 
+
+Jaldhar H. Vyas, <jaldhar@braincells.com>.
+
+Copyright (c) 2003 Consolidated Braincells Inc.  All rights reserved.  
+This program is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.
+
+      Copyright 1989-2001, Larry Wall  All rights reserved.
+
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of either:
+
+      a) the GNU General Public License as published by the Free Software
+         Foundation; either version 1, or (at your option) any later
+         version, or
+
+      b) the "Artistic License" which comes with Perl.
+
+On Debian GNU/Linux systems, the complete text of the GNU General
+Public License can be found in `/usr/share/common-licenses/GPL' and
+the Artistic Licence in `/usr/share/common-licenses/Artistic'.
+

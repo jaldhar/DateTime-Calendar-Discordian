@@ -1,0 +1,6 @@
+Revision history for Perl extension DateTime::Calendar::Discordian.
+
+0.8   Thu Jun 10 05:17:12 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n DateTime::Calendar::Discordian
+

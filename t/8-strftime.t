@@ -12,11 +12,11 @@ is(DateTime::Calendar::Discordian->from_object(
 
 is(DateTime::Calendar::Discordian->from_object(
   object => DateTime->new(day => 29, month => 2, year =>, 2000,)
-  )->strftime("%{Happy St. Tib's Day!%}"), "Happy St. Tib's Day!", 'date 3');
+  )->strftime("%{%A, the %e day of %B%} in the YOLD %Y"), "St. Tib's Day in the YOLD 3166", 'date 3');
 
 is(DateTime::Calendar::Discordian->from_object(
   object => DateTime->new(day => 28, month => 2, year =>, 2000,)
-  )->strftime("%{Happy St. Tib's Day!%}"), "", 'date 4');
+  )->strftime("%{%A, the %e day of %B%} in the YOLD %Y"), "Prickle-Prickle, the 59th day of Chaos in the YOLD 3166", 'date 4');
 
 is(DateTime::Calendar::Discordian->new(day => 50, season => 'Discord', 
   year => 3170,)->strftime("%NHappy %H"), "Happy Discoflux", 'date 5');

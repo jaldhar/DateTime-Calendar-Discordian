@@ -222,7 +222,7 @@ sub strftime
   {
     ($self->{day} eq "St. Tib's Day" || 
       ($self->{day} != 5 && $self->{day} != 50)) ? s/%N.+$// : s/%N//g;
-    ($self->{day} ne "St. Tib's Day") ? s/%\{.+?%\}//g : s/%[\{|\}]//g;
+    ($self->{day} eq "St. Tib's Day") ? s/%\{.+?%\}/%d/g : s/%[{}]//g;
 
     s/%([%*A-Za-z])/ $formats{$1} ? $formats{$1}->($self) : $1 /ge;
     return $_ unless wantarray;

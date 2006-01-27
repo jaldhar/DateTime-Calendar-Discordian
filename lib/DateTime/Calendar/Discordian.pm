@@ -6,7 +6,7 @@ use Carp;
 use DateTime::Locale;
 use Params::Validate qw( validate SCALAR OBJECT UNDEF);
 
-our $VERSION = '0.9.2';
+our $VERSION = '0.9.3';
 
 our @days = (
   { name => 'Sweetmorn', abbrev => 'SM', },
@@ -585,7 +585,7 @@ Jaldhar H. Vyas, E<lt>jaldhar@braincells.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004, Consolidated Braincells Inc.
+Copyright (C) 2006, Consolidated Braincells Inc.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

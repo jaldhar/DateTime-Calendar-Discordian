@@ -1,10 +1,5 @@
 Build.PL
 Changes
-debian/changelog
-debian/compat
-debian/control
-debian/copyright
-debian/rules
 Makefile.PL
 lib/DateTime/Calendar/Discordian.pm
 LICENSE
@@ -21,4 +16,4 @@ t/5-day_abbr.t
 t/6-cardinals.t
 t/7-st_tibs.t
 t/8-strftime.t
-
+t/9-season_boundaries.t

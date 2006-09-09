@@ -6,7 +6,7 @@ use Carp;
 use DateTime::Locale;
 use Params::Validate qw( validate SCALAR OBJECT UNDEF);
 
-our $VERSION = '0.9.2';
+our $VERSION = '0.9.4';
 
 our @days = (
   { name => 'Sweetmorn', abbrev => 'SM', },
@@ -332,8 +332,18 @@ sub _rd2discordian
     my @seas = ('Chaos', 'Discord', 'Confusion', 'Bureaucracy', 
       'The Aftermath');
     $season = $seas[_floor($d4 / 73)];
-    $day = $d4 - $seasons{$season}->{offset} +
-      ($d4 < 60 ? 0 : _is_leap_year($year - 1166) ? -1 : 0);
+
+    $day = $d4 - $seasons{$season}->{offset};
+
+    if ($d4 > 60 && _is_leap_year($year - 1166))
+    {
+        $day--;
+    }
+
+    if ($day < 1)
+    {
+      $day += 73;
+    }   
   }
 
   return( $day, $season, $year);
@@ -585,7 +595,7 @@ Jaldhar H. Vyas, E<lt>jaldhar@braincells.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004, Consolidated Braincells Inc.
+Copyright (C) 2006, Consolidated Braincells Inc.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

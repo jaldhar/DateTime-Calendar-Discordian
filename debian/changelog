@@ -1,12 +1,12 @@
 libdatetime-calendar-discordian-perl (0.9.4-1) unstable; urgency=low
 
   * New upstream version.
-    +  The module was giving 0 as the day number around season boundaries.  
-       (Closes: #381793)
-          
-  * Package is not debian native anymore. 
+    +  Fixes a problem where the module was giving 0 as the day number 
+       around season boundaries. (Closes: #381793)
+  * Package is not debian native anymore.
+  * Updated standards version.
 
- -- Jaldhar H. Vyas <jaldhar@debian.org>  Sat,  9 Sep 2006 16:08:32 -0400
+ -- Jaldhar H. Vyas <jaldhar@debian.org>  Sat,  9 Sep 2006 16:18:27 -0400
 
 libdatetime-calendar-discordian-perl (0.9.2) unstable; urgency=low
 

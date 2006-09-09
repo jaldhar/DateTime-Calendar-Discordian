@@ -3,7 +3,7 @@ Section: perl
 Priority: optional
 Build-Depends-Indep: perl (>= 5.8.0-7), debhelper (>= 4.0.2), libmodule-build-perl, libdatetime-perl
 Maintainer: Jaldhar H. Vyas <jaldhar@debian.org>
-Standards-Version: 3.6.1
+Standards-Version: 3.7.2
 
 Package: libdatetime-calendar-discordian-perl
 Architecture: all

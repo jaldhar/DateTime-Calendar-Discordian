@@ -1,7 +1,8 @@
 Source: libdatetime-calendar-discordian-perl
 Section: perl
 Priority: optional
-Build-Depends-Indep: perl (>= 5.8.0-7), debhelper (>= 4.0.2), libmodule-build-perl, libdatetime-perl
+Build-Depends: debhelper (>= 4.0.2)
+Build-Depends-Indep: perl (>= 5.8.0-7), libmodule-build-perl, libdatetime-perl
 Maintainer: Jaldhar H. Vyas <jaldhar@debian.org>
 Standards-Version: 3.7.2
 

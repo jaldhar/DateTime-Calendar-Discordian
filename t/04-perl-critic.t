@@ -11,7 +11,7 @@ if ( not $ENV{TEST_AUTHOR} ) {
     plan( skip_all => $msg );
 }
 
-eval { require Test::Perl::Critic; };
+eval { use Test::Perl::Critic; };
 
 if ( $EVAL_ERROR ) {
     my $msg = 'Test::Perl::Critic required to criticise code';

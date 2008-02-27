@@ -1,7 +1,11 @@
+#
+# $Id$
+#
+use warnings;
+use strict;
 use Test::More tests => 30;
 use DateTime;
 use DateTime::Calendar::Discordian;
-
 
 my $dt;
 my $dtcd;

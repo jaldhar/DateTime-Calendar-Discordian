@@ -1,8 +1,10 @@
+#
+# $Id$
+#
 use strict;
 use warnings;
 use English qw(-no_match_vars);
 use Test::More;
-use Test::Perl::Critic;
 
 if ( not $ENV{TEST_AUTHOR} ) {
     my $msg = 'Author test.  Set $ENV{TEST_AUTHOR} to a true value to run.';

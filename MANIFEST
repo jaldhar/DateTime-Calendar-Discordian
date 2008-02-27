@@ -7,11 +7,11 @@ MANIFEST
 MANIFEST.SKIP
 META.yml
 README
-t/0-signature.t
-t/1-DateTime-Calendar-Discordian.t
-t/2-pod.t
-t/3-pod-coverage.t
-t/4-perl-critic.t
+t/00-signature.t
+t/01-DateTime-Calendar-Discordian.t
+t/02-pod.t
+t/03-pod-coverage.t
+t/04-perl-critic.t
 t/10-utc_rd_values.t
 t/11-from_object.t
 t/12-day_name.t

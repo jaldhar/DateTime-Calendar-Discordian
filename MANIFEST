@@ -20,3 +20,4 @@ t/14-cardinals.t
 t/15-st_tibs.t
 t/16-strftime.t
 t/17-season_boundaries.t
+t/perlcriticrc

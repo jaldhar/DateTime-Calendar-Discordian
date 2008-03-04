@@ -1,4 +1,3 @@
-## no critic (RequirePodAtEnd RequirePodSections Spelling)
 # $Id$
 
 =head1 NAME

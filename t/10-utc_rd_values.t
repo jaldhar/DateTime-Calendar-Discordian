@@ -1,3 +1,8 @@
+#
+# $Id$
+#
+use warnings;
+use strict;
 use Test::More tests => 33;
 use DateTime::Calendar::Discordian;
 

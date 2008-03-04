@@ -1,356 +1,4 @@
-package DateTime::Calendar::Discordian;
-
-use strict;
-use warnings;
-use Carp;
-use DateTime::Locale;
-use Params::Validate qw( validate SCALAR OBJECT UNDEF);
-
-our $VERSION = '0.9.4';
-
-our @days = (
-  { name => 'Sweetmorn', abbrev => 'SM', },
-  { name => 'Boomtime', abbrev => 'BT', },
-  { name => 'Pungenday', abbrev => 'PD', },
-  { name => 'Prickle-Prickle', abbrev => 'PP', }, 
-  { name => 'Setting Orange', abbrev => 'SO', },
-);
-
-our %seasons =
-(
-  'Chaos'         => { abbrev => 'Chs', offset => 0, 
-                       apostle_holyday => 'Mungday', 
-                       season_holyday => 'Chaoflux',
-                     },  
-  'Discord'       => { abbrev => 'Dsc', offset => 73,
-                       apostle_holyday => 'Mojoday', 
-                       season_holyday => 'Discoflux',
-                     },
-  'Confusion'     => {
-                       abbrev => 'Cfn', offset => 146,
-                       apostle_holyday => 'Syaday', 
-                       season_holyday => 'Confuflux',
-                     },
-  'Bureaucracy'   => { abbrev => 'Bcy', offset => 219,
-                       apostle_holyday => 'Zaraday',
-                       season_holyday => 'Bureflux',
-                     },
-  'The Aftermath' => { abbrev => 'Afm', offset => 292,
-                       apostle_holyday => 'Maladay',
-                       season_holyday => 'Afflux',
-                     },
-);
-
-our @excl = ('Hail Eris!', 'All Hail Discordia!', 'Kallisti!', 'Fnord.', 
-  'Or not.', 'Wibble.', 'Pzat!', "P'tang!", 'Frink!', 'Slack!', 
-  'Praise "Bob"!', 'Or kill me.', 'Grudnuk demand sustenance!', 
-  'Keep the Lasagna flying!', 'Umlaut Zebra über alles!', 
-  'You are what you see.','Or is it?', 'This statement is false.', 
-  'Hail Eris, Hack Perl!',);
-
-our %formats = (
-  'a' => sub { $_[0]->day_abbr },
-  'A' => sub { $_[0]->day_name },
-  'b' => sub { $_[0]->season_abbr },
-  'B' => sub { $_[0]->season_name  },
-  'd' => sub { $_[0]->day },
-  'e' => sub { _cardinal($_[0]->{day}) },
-  'H' => sub { $_[0]->holyday },
-  'n' => sub { "\n" },
-  't' => sub { "\t" },
-  'X' => sub { $_[0]->days_till_X },
-  'Y' => sub { $_[0]->year },
-  '%' => sub { '%' },
-  '.' => sub { $_[0]->_randexcl },
-);
-
-our $tibsday = qr/s(?:ain)?t\.?\s*tib'?s?\s*(?:day)?/i;
-
-sub new
-{
-  my $class = shift;
-
-  my %args = validate( @_, { 
-    day         => { type      => SCALAR,
-                     default   => 0, 
-                     callbacks => { "between 1 and 73 or St. Tib's Day" => 
-                                    sub { ($_[0] =~ /$tibsday/ && 
-                                      !defined($_[1]->{season})) ||
-                                      ($_[0] > 0 && $_[0] < 74) },
-                                  },
-                   },
-    season      => { type      => SCALAR | UNDEF,
-                     default   => 0,
-                     callbacks => { 'valid season name' => 
-                                    sub { (!defined($_[0]) && $_[1]->{day} =~
-                                    /$tibsday/) || grep /$_/i, keys %seasons },
-                                  },
-                   },
-    year        => { type      => SCALAR,
-                     default   => 0,
-                   },
-    rd_secs     => { type => SCALAR,
-                     default => 0,
-                   },
-    rd_nanosecs => { type => SCALAR,
-                     default => 0,
-                   },
-    locale      => { type => SCALAR | OBJECT | UNDEF,
-                     default => undef,
-                   },
-
-  });
-
-  $args{season} = join(' ', map { ucfirst(lc($_)) } split(' ', $args{season}))
-   if defined($args{season});
-  $args{day} = "St. Tib's Day" if $args{day} =~ /$tibsday/;
-  croak "Not a leap year" if $args{day} eq "St. Tib's Day" && 
-    !_is_leap_year($args{year} - 1166);
-  my $self = bless \%args, $class;
-  $self->{epoch} = -426237;
-  $self->{fnord} = 5;
-  if(defined($self->{locale}))
-  {
-    $self->{locale}  = DateTime::Locale->load($args{locale})
-      unless (ref $self->{locale});
-  }
-  $self->{rd} = $self->_discordian2rd;
-
-  return bless $self, $class;
-}
-
-sub clone 
-{ 
-  bless { %{ $_[0] } }, ref $_[0] 
-}
-
-sub day
-{
-  my($self) = @_;
-
-  return $self->{day};
-}
-
-sub day_abbr
-{
-  my($self) = @_;
-  
-  return undef if ($self->{day} eq "St. Tib's Day");
-  
-  my $day_of_year = $seasons{$self->{season}}->{offset} + $self->{day};
-  return $days[($day_of_year - 1) % 5]->{abbrev};
-}
-
-sub day_name
-{
-  my($self) = @_;
-
-  return $self->{day} if ($self->{day} eq "St. Tib's Day");
-
-  my $day_of_year = $seasons{$self->{season}}->{offset} + $self->{day};
-  return $days[($day_of_year - 1) % 5]->{name};
-}
-
-sub days_till_x
-{
-  my($self) = @_;
-  return 3163186 - $self->{rd};
-}
-
-sub from_object
-{
-  my $class = shift;
-  my %args = validate( @_,
-    { object => {
-                  type => OBJECT,
-                  can => 'utc_rd_values',
-                },
-      locale => {
-                  type => SCALAR | OBJECT | UNDEF,
-                  default => undef, 
-                },
-    },
-  );
-
-  $args{object} = $args{object}->clone->set_time_zone( 'floating' )
-    if $args{object}->can( 'set_time_zone' );
-
-  my ( $rd_days, $rd_secs, $rd_nanosecs ) = $args{object}->utc_rd_values;
-
-  my ($day, $season, $year) = $class->_rd2discordian($rd_days);
-
-  my $newobj = $class->new(day         => $day, 
-                           season      => $season,
-                           year        => $year,
-                          );
- 
-  $newobj->{rd_secs}     = $rd_secs || 0;
-  $newobj->{rd_nanosecs} = $rd_nanosecs || 0;
-  $newobj->{locale}      = $args{locale};
- 
-  return $newobj;
-}
-
-sub holyday
-{
-  my($self) = @_;
-
-  return $seasons{$self->{season}}->{apostle_holyday} if ($self->{day} == 5);
-  return $seasons{$self->{season}}->{season_holyday} if ($self->{day} == 50);
-  return "";
-}
-
-sub season_abbr
-{
-  my($self) = @_;
-
-  return $seasons{$self->{season}}->{abbrev};
-}
-
-sub season_name
-{
-  my($self) = @_;
-
-  return $self->{season};
-}
-
-sub strftime
-{
-  my ($self, @r) = @_;
-
-  foreach (@r) 
-  {
-    ($self->{day} eq "St. Tib's Day" || 
-      ($self->{day} != 5 && $self->{day} != 50)) ? s/%N.+$// : s/%N//g;
-    ($self->{day} eq "St. Tib's Day") ? s/%\{.+?%\}/%d/g : s/%[{}]//g;
-
-    s/%([%*A-Za-z])/ $formats{$1} ? $formats{$1}->($self) : $1 /ge;
-    return $_ unless wantarray;
-  }
-  return @r;
-}
-
-sub utc_rd_values 
-{
-  my($self) = @_;
-
-  return( $self->{ rd }, $self->{ rd_secs }, $self->{ rd_nanosecs } || 0 );
-}
-
-sub year
-{
-  my($self) = @_;
-
-  return $self->{year};
-}
-
-sub _cardinal
-{
-  my($day) = @_;
-
-  my $cardinal =  $day;
-  return $cardinal . 'st' if ($day % 10 == 1 && $day != 11);
-  return $cardinal . 'nd' if ($day % 10 == 2 && $day != 12);
-  return $cardinal . 'rd' if ($day % 10 == 3 && $day != 13);
-  return $cardinal . 'th';
-}
-
-#
-# calculate RD (Rata Dia) date
-#
-sub _discordian2rd
-{
-  my($self) = @_;
-
-  # Convert Discordian year to Gregorian - 1  
-  my $yr = $self->{year} - 1167;
-
-  # Start with the epoch + number of elapsed days in intervening years.
-  # Add number of intervening leap days.
-  my $rd = 0
-    + 365 * ($yr)
-    + _floor($yr / 4)
-    - _floor($yr / 100)
-    + _floor($yr / 400);
-
-  # add number of days elapsed this year.
-  my $day_of_year = $self->{day} eq "St. Tib's Day" ? 60 :
-    $seasons{$self->{season}}->{offset} + $self->{day};
-  $rd += $day_of_year;
-
-  # add 1 if this is a leap year and it is past St. Tibs' Day.
-  $rd += $day_of_year <= 60 ? 0 : _is_leap_year($yr + 1) ? 1 : 0;
-
-  return $rd;
-}
-
-sub _floor
-{
-  my ($x)  = @_;
-  my $ix = int $x;
-  return ($ix <= $x) ? $ix : $ix - 1;
-}
-
-sub _is_leap_year
-{
-  my($yr) = @_;
-  my $c = ($yr) % 400;
-
-  return ($yr % 4 == 0) && $c != 100 &&  $c != 200 && $c != 300;
-}
-
-sub _randexcl
-{
-  my($self) = @_;
-
-  return $excl[int(rand($#excl))];
-}
-
-sub _rd2discordian
-{
-  my ($self, $rd ) = @_;
-
-  my $n400 = _floor($rd / 146097);
-  my $d1 = $rd % 146097;
-  my $n100 = _floor($d1 / 36524);  
-  my $d2 = $d1 % 36524;
-  my $n4 = _floor($d2 / 1461);
-  my $d3 = $d2 % 1461;
-  my $n1 = _floor($d3 / 365);
-  my $d4 = $d3 % 365;
-
-  my $year = (400 * $n400) + (100 * $n100) + (4 * $n4) + $n1 + 1167;
-
-  my ($season, $day);
-  if ($d4 == 60 && _is_leap_year($year - 1166))
-  {
-    $season = undef;
-    $day = "St. Tib's Day";
-  }
-  else
-  {
-    my @seas = ('Chaos', 'Discord', 'Confusion', 'Bureaucracy', 
-      'The Aftermath');
-    $season = $seas[_floor($d4 / 73)];
-
-    $day = $d4 - $seasons{$season}->{offset};
-
-    if ($d4 > 60 && _is_leap_year($year - 1166))
-    {
-        $day--;
-    }
-
-    if ($day < 1)
-    {
-      $day += 73;
-    }   
-  }
-
-  return( $day, $season, $year);
-}
-
-1;
-__END__
+# $Id$
 
 =head1 NAME
 
@@ -366,6 +14,24 @@ A module that implements the Discordian calendar made popular(?) in the
 "Illuminatus!" trilogy by Robert Shea and Robert Anton Wilson and by the
 Church of the SubGenius.
 
+=cut
+
+package DateTime::Calendar::Discordian;
+
+use strict;
+use warnings;
+use Carp;
+use DateTime::Locale;
+use Params::Validate qw( validate SCALAR OBJECT UNDEF);
+
+=head1 VERSION
+
+This document describes DateTime::Calendar::Discordian version 0.9.5
+
+=cut
+
+our $VERSION = '0.9.5';
+
 =head1 DESCRIPTION
 
 =head2 The Discordian Calendar
@@ -379,17 +45,6 @@ Church of the SubGenius.
 	Confusion	Sri Syadasti
 	Bureaucracy	Zarathud
 	The Aftermath	The Elder Malaclypse
-
-=head3 Days Of The Week
-
-	1. Sweetmorn 
-	2. Boomtime 
-	3. Pungenday 
-	4. Prickle-Prickle 
-	5. Setting Orange 
-
-The days of the week are named from the five Basic Elements: sweet,
-boom, pungent, prickle and orange.
 
 =head3 Holydays
 
@@ -416,11 +71,89 @@ X Day is when the Church of the SubGenius believes the alien X-ists will
 destroy the world.  The revised date is equivalent to Confusion 40, 9827
 YOLD.
 
-=head1 USAGE
+=cut
 
-=over 4
+my %seasons = (
+    'Chaos' => {
+        abbrev          => 'Chs',
+        offset          => 0,
+        apostle_holyday => 'Mungday',
+        season_holyday  => 'Chaoflux',
+    },
+    'Discord' => {
+        abbrev          => 'Dsc',
+        offset          => 73,
+        apostle_holyday => 'Mojoday',
+        season_holyday  => 'Discoflux',
+    },
+    'Confusion' => {
+        abbrev          => 'Cfn',
+        offset          => 146,
+        apostle_holyday => 'Syaday',
+        season_holyday  => 'Confuflux',
+    },
+    'Bureaucracy' => {
+        abbrev          => 'Bcy',
+        offset          => 219,
+        apostle_holyday => 'Zaraday',
+        season_holyday  => 'Bureflux',
+    },
+    'The Aftermath' => {
+        abbrev          => 'Afm',
+        offset          => 292,
+        apostle_holyday => 'Maladay',
+        season_holyday  => 'Afflux',
+    },
+);
 
-=item B<new>
+my $tibsday = qr/s(?:ain)?t\.?\s*tib'?s?\s*(?:day)?/imx;
+
+=head3 Days Of The Week
+
+	1. Sweetmorn 
+	2. Boomtime 
+	3. Pungenday 
+	4. Prickle-Prickle 
+	5. Setting Orange 
+
+The days of the week are named from the five Basic Elements: sweet,
+boom, pungent, prickle and orange.
+
+=cut
+
+my @days = (
+    { name => 'Sweetmorn',       abbrev => 'SM', },
+    { name => 'Boomtime',        abbrev => 'BT', },
+    { name => 'Pungenday',       abbrev => 'PD', },
+    { name => 'Prickle-Prickle', abbrev => 'PP', },
+    { name => 'Setting Orange',  abbrev => 'SO', },
+);
+
+my @excl = (
+    'Hail Eris!',
+    'All Hail Discordia!',
+    'Kallisti!',
+    'Fnord.',
+    'Or not.',
+    'Wibble.',
+    'Pzat!',
+    q{P'tang!},
+    'Frink!',
+    'Slack!',
+    'Praise "Bob"!',
+    'Or kill me.',
+    'Grudnuk demand sustenance!',
+    'Keep the Lasagna flying!',
+    'Umlaut Zebra über alles!',
+    'You are what you see.',
+    'Or is it?',
+    'This statement is false.',
+    'Hail Eris, Hack Perl!',
+);
+
+=head1 METHODS
+
+=head2 new
 
 Constructs a new I<DateTime::Calendar::Discordian> object.  This class
 method requires the parameters I<day>, I<season>, and I<year>.  If
@@ -431,30 +164,146 @@ parameters are given.  For example:
 my $dtcd = DateTime::Calendar::Discordian->new(
   day => 8, season => 'Discord', year => 3137, );
 
-=item B<clone>
+=cut
+
+sub new {
+    my ( $class, @arguments ) = @_;
+
+    my %args = validate(
+        @arguments,
+        {   day => {
+                type      => SCALAR,
+                default   => 0,
+                callbacks => {
+                    q{between 1 and 73 or St. Tib's Day} => sub {
+                        ( $_[0] =~ /$tibsday/mx && !defined $_[1]->{season} )
+                            || ( $_[0] > 0 && $_[0] < 74 );
+                    },
+                },
+            },
+            season => {
+                type      => SCALAR | UNDEF,
+                default   => 0,
+                callbacks => {
+                    'valid season name' => sub {
+                        ( !defined( $_[0] ) && $_[1]->{day} =~ /$tibsday/mx )
+                            || scalar grep {/$_/imx} keys %seasons;
+                    },
+                },
+            },
+            year => {
+                type    => SCALAR,
+                default => 0,
+            },
+            rd_secs => {
+                type    => SCALAR,
+                default => 0,
+            },
+            rd_nanosecs => {
+                type    => SCALAR,
+                default => 0,
+            },
+            locale => {
+                type    => SCALAR | OBJECT | UNDEF,
+                default => undef,
+            },
+
+        }
+    );
+
+    if ( defined $args{season} ) {
+        $args{season} = join q{ }, map { ucfirst lc $_ } split q{ },
+            $args{season};
+    }
+    if ( $args{day} =~ /$tibsday/mx ) {
+        $args{day} = q{St. Tib's Day};
+    }
+    croak q{Not a leap year}
+        if $args{day} eq q{St. Tib's Day}
+        && !_is_leap_year( $args{year} - 1166 );
+    my $self = bless \%args, $class;
+    $self->{epoch} = -426_237;
+    $self->{fnord} = 5;
+    if ( defined $self->{locale} ) {
+        if ( !ref $self->{locale} ) {
+            $self->{locale} = DateTime::Locale->load( $args{locale} );
+        }
+    }
+    $self->{rd} = $self->_discordian2rd;
+
+    return bless $self, $class;
+}
+
+=head2 clone
 
 Returns a copy of the object.
 
-=item B<day>
+=cut
+
+sub clone {
+    my ($object) = @_;
+    return bless { %{$object} }, ref $object;
+}
+
+=head2 day
 
 Returns the day of the season as a number between 1 and 73 or the string
 "St. Tib's Day".
 
-=item B<day_abbr>
+=cut
 
-Returns the name of the day of the week in abbreviated form or undef if
+sub day {
+    my ($self) = @_;
+
+    return $self->{day};
+}
+
+=head2 day_abbr
+
+Returns the name of the day of the week in abbreviated form or false if
 it is "St. Tib's Day".
 
-=item B<day_name>
+=cut
+
+sub day_abbr {
+    my ($self) = @_;
+
+    if ( $self->{day} eq q{St. Tib's Day} ) {
+        return;
+    }
+
+    my $day_of_year = $seasons{ $self->{season} }->{offset} + $self->{day};
+    return $days[ ( $day_of_year - 1 ) % 5 ]->{abbrev};
+}
+
+=head2 day_name
 
 Returns the full name of the day of the week or "St. Tib's Day" if it is
 that day.
 
-=item B<days_till_x>
+=cut
+
+sub day_name {
+    my ($self) = @_;
+
+    return $self->{day} if ( $self->{day} eq q{St. Tib's Day} );
+
+    my $day_of_year = $seasons{ $self->{season} }->{offset} + $self->{day};
+    return $days[ ( $day_of_year - 1 ) % 5 ]->{name};
+}
+
+=head2 days_till_x
 
 Returns the number of days until X Day.
 
-=item B<from_object>
+=cut
+
+sub days_till_x {
+    my ($self) = @_;
+    return 3_163_186 - $self->{rd};
+}
+
+=head2 from_object
 
 Builds a I<DateTime::Calendar::Discordian> object from another
 I<DateTime> object.  This function takes an I<object> parameter and
@@ -463,20 +312,85 @@ optionally I<locale>. For example:
 my $dtcd = DateTime::Calendar::Discordian->from_object(
   object => DateTime->new(day => 22, month => 3, year => 1971,));
 
-=item B<holyday>
+=cut
+
+sub from_object {
+    my ( $class, @arguments ) = @_;
+    my %args = validate(
+        @arguments,
+        {   object => {
+                type => OBJECT,
+                can  => 'utc_rd_values',
+            },
+            locale => {
+                type    => SCALAR | OBJECT | UNDEF,
+                default => undef,
+            },
+        },
+    );
+
+    if ( $args{object}->can('set_time_zone') ) {
+        $args{object} = $args{object}->clone->set_time_zone('floating');
+    }
+    my ( $rd_days, $rd_secs, $rd_nanosecs ) = $args{object}->utc_rd_values;
+
+    my ( $day, $season, $year ) = $class->_rd2discordian($rd_days);
+
+    my $newobj = $class->new(
+        day    => $day,
+        season => $season,
+        year   => $year,
+    );
+
+    $newobj->{rd_secs}     = $rd_secs     || 0;
+    $newobj->{rd_nanosecs} = $rd_nanosecs || 0;
+    $newobj->{locale} = $args{locale};
+
+    return $newobj;
+}
+
+=head2 holyday
 
 If the current day is a holy day, returns the name of that day otherwise
 returns an empty string.
 
-=item B<season_abbr>
+=cut 
+
+sub holyday {
+    my ($self) = @_;
+
+    return $seasons{ $self->{season} }->{apostle_holyday}
+        if ( $self->{day} == 5 );
+    return $seasons{ $self->{season} }->{season_holyday}
+        if ( $self->{day} == 50 );
+    return q{};
+}
+
+=head2 season_abbr
 
 Returns the abbreviated name of the current season.
 
-=item B<season_name>
+=cut
+
+sub season_abbr {
+    my ($self) = @_;
+
+    return $seasons{ $self->{season} }->{abbrev};
+}
+
+=head2 season_name
 
 Returns the full name of the current season.
 
-=item B<strftime>
+=cut
+
+sub season_name {
+    my ($self) = @_;
+
+    return $self->{season};
+}
+
+=head2 strftime
 
 This function takes one or more parameters consisting of strings
 containing special specifiers.  For each such string it will return a
@@ -487,19 +401,7 @@ with the L<ddate(1)> program not necessarily the L<strftime(3)> C
 function.  If you give a format specifier that doesn't exist, then it is
 simply treated as text.
 
-=item B<utc_rd_values>
-
-Returns a three-element array containing the current UTC RD days,
-seconds, and nanoseconds.  See L<DateTime> for more details.
-
-=item B<year>
-
-Returns the current year according to the YOLD (Year Of Lady Discord)
-era.
-
-=back
-
-=head2 strftime Specifiers
+=head3 strftime Specifiers
 
 The following specifiers are allowed in the format string given to the
 B<strftime> method:
@@ -580,6 +482,171 @@ Try it and see.
 
 =back
 
+=cut
+
+my %formats = (
+    'a'  => sub { $_[0]->day_abbr },
+    'A'  => sub { $_[0]->day_name },
+    'b'  => sub { $_[0]->season_abbr },
+    'B'  => sub { $_[0]->season_name },
+    'd'  => sub { $_[0]->day },
+    'e'  => sub { _cardinal( $_[0]->{day} ) },
+    'H'  => sub { $_[0]->holyday },
+    'n'  => sub {"\n"},
+    't'  => sub {"\t"},
+    'X'  => sub { $_[0]->days_till_X },
+    'Y'  => sub { $_[0]->year },
+    q{%} => sub {q{%}},
+    q{.} => sub { $_[0]->_randexcl },
+);
+
+sub strftime {
+    my ( $self, @r ) = @_;
+
+    foreach (@r) {
+        ( $self->{day} eq q{St. Tib's Day}
+                || ( $self->{day} != 5 && $self->{day} != 50 ) )
+            ? s/%N.+$//mx
+            : s/%N//gmx;
+        ( $self->{day} eq q{St. Tib's Day} )
+            ? s/%\{.+?%\}/%d/gmx
+            : s/%[{}]//gmx;
+
+        s/%([%*A-Za-z])/ $formats{$1} ? $formats{$1}->($self) : $1 /egmx;
+        if ( !wantarray ) {
+            return $_;
+        }
+    }
+    return @r;
+}
+
+=head2 utc_rd_values
+
+Returns a three-element array containing the current UTC RD days,
+seconds, and nanoseconds.  See L<DateTime> for more details.
+
+=cut
+
+sub utc_rd_values {
+    my ($self) = @_;
+
+    return ( $self->{rd}, $self->{rd_secs}, $self->{rd_nanosecs} || 0 );
+}
+
+=head2 year
+
+Returns the current year according to the YOLD (Year Of Lady Discord)
+era.
+
+=cut
+
+sub year {
+    my ($self) = @_;
+
+    return $self->{year};
+}
+
+sub _cardinal {
+    my ($day) = @_;
+
+    my $cardinal = $day;
+    return $cardinal . 'st' if ( $day % 10 == 1 && $day != 11 );
+    return $cardinal . 'nd' if ( $day % 10 == 2 && $day != 12 );
+    return $cardinal . 'rd' if ( $day % 10 == 3 && $day != 13 );
+    return $cardinal . 'th';
+}
+
+#
+# calculate RD (Rata Dia) date
+#
+sub _discordian2rd {
+    my ($self) = @_;
+
+    # Convert Discordian year to Gregorian - 1
+    my $yr = $self->{year} - 1167;
+
+    # Start with the epoch + number of elapsed days in intervening years.
+    # Add number of intervening leap days.
+    my $rd = 0    #
+        + 365 * ($yr)    #
+        + _floor( $yr / 4 )    #
+        - _floor( $yr / 100 ) + _floor( $yr / 400 );
+
+    # add number of days elapsed this year.
+    my $day_of_year
+        = $self->{day} eq q{St. Tib's Day}
+        ? 60
+        : $seasons{ $self->{season} }->{offset} + $self->{day};
+    $rd += $day_of_year;
+
+    # add 1 if this is a leap year and it is past St. Tibs' Day.
+    $rd += $day_of_year <= 60 ? 0 : _is_leap_year( $yr + 1 ) ? 1 : 0;
+
+    return $rd;
+}
+
+sub _floor {
+    my ($x) = @_;
+    my $ix = int $x;
+    return ( $ix <= $x ) ? $ix : $ix - 1;
+}
+
+sub _is_leap_year {
+    my ($yr) = @_;
+    my $c = ($yr) % 400;
+
+    return ( $yr % 4 == 0 ) && $c != 100 && $c != 200 && $c != 300;
+}
+
+sub _randexcl {
+    my ($self) = @_;
+
+    return $excl[ int rand $#excl ];
+}
+
+sub _rd2discordian {
+    my ( $self, $rd ) = @_;
+
+    my $n400 = _floor( $rd / 146_097 );
+    my $d1   = $rd % 146_097;
+    my $n100 = _floor( $d1 / 36_524 );
+    my $d2   = $d1 % 36_524;
+    my $n4   = _floor( $d2 / 1461 );
+    my $d3   = $d2 % 1461;
+    my $n1   = _floor( $d3 / 365 );
+    my $d4   = $d3 % 365;
+
+    my $year = ( 400 * $n400 ) + ( 100 * $n100 ) + ( 4 * $n4 ) + $n1 + 1167;
+
+    my ( $season, $day );
+    if ( $d4 == 60 && _is_leap_year( $year - 1166 ) ) {
+        $season = undef;
+        $day    = q{St. Tib's Day};
+    }
+    else {
+        my @seas = (
+            'Chaos', 'Discord', 'Confusion', 'Bureaucracy',
+            'The Aftermath',
+        );
+        $season = $seas[ _floor( $d4 / 73 ) ];
+
+        $day = $d4 - $seasons{$season}->{offset};
+
+        if ( $d4 > 60 && _is_leap_year( $year - 1166 ) ) {
+            $day--;
+        }
+
+        if ( $day < 1 ) {
+            $day += 73;
+        }
+    }
+
+    return ( $day, $season, $year );
+}
+
+1;
+__END__
+
 =head1 SUPPORT
 
 Support for this module is provided via the datetime@perl.org email
@@ -595,7 +662,7 @@ Jaldhar H. Vyas, E<lt>jaldhar@braincells.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006, Consolidated Braincells Inc.
+Copyright (C) 2008, Consolidated Braincells Inc.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

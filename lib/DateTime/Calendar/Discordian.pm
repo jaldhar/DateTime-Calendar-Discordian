@@ -27,11 +27,11 @@ use Params::Validate qw( validate SCALAR OBJECT UNDEF);
 
 =head1 VERSION
 
-version 0.9.4
+This document describes DateTime::Calendar::Discordian version 0.9.5
 
 =cut
 
-our $VERSION = '0.9.4';
+our $VERSION = '0.9.5';
 
 =head1 DESCRIPTION
 
@@ -663,7 +663,7 @@ Jaldhar H. Vyas, E<lt>jaldhar@braincells.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006, Consolidated Braincells Inc.
+Copyright (C) 2008, Consolidated Braincells Inc.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

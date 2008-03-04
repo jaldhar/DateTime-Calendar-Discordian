@@ -1,5 +1,9 @@
 Revision history for Perl extension DateTime::Calendar::Discordian.
 
+0.9.5 Mon Mar  3 23:20:20 2008
+    - Ran the module through Perl::Critic
+    - Sign the package with a valid public key
+    
 0.9.4 Sat Sep 02 04:46:23 2006
     - Fixed Debian bug# 381793 where the module was giving 0 as the day 
       number around season boundaries and added tests.

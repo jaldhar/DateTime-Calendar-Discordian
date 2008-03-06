@@ -1,3 +1,9 @@
+libdatetime-calendar-discordian-perl (0.9.6-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Jaldhar H. Vyas <jaldhar@debian.org>  Thu, 06 Mar 2008 08:17:12 -0500
+
 libdatetime-calendar-discordian-perl (0.9.5-1) unstable; urgency=low
 
   * New upstream version.

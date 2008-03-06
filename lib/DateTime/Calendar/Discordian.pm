@@ -26,11 +26,11 @@ use Params::Validate qw( validate SCALAR OBJECT UNDEF);
 
 =head1 VERSION
 
-This document describes DateTime::Calendar::Discordian version 0.9.5
+This document describes DateTime::Calendar::Discordian version 0.9.6
 
 =cut
 
-our $VERSION = '0.9.5';
+our $VERSION = '0.9.6';
 
 =head1 DESCRIPTION
 

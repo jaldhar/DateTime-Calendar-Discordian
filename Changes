@@ -1,5 +1,10 @@
 Revision history for Perl extension DateTime::Calendar::Discordian.
 
+0.9.6 Thu Mar  6 07:39:24 2008
+    - Fixed t/4-perl-critic.t so it deals properly with the absence of 
+      Test::Perl::Critic.  Thanks to haoess and thospell on Perl Monks
+      for the solution.
+      
 0.9.5 Mon Mar  3 23:20:20 2008
     - Ran the module through Perl::Critic
     - Sign the package with a valid public key

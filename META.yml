@@ -1,6 +1,6 @@
 ---
 name: DateTime-Calendar-Discordian
-version: 0.9.5
+version: 0.9.6
 author:
   - 'Jaldhar H. Vyas <jaldhar@braincells.com>'
 abstract: Perl extension for the Discordian Calendar
@@ -12,5 +12,5 @@ requires:
 provides:
   DateTime::Calendar::Discordian:
     file: lib/DateTime/Calendar/Discordian.pm
-    version: 0.9.5
+    version: 0.9.6
 generated_by: Module::Build version 0.26

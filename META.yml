@@ -1,16 +1,23 @@
 ---
-name: DateTime-Calendar-Discordian
-version: 0.9.6
+abstract: 'Perl extension for the Discordian Calendar'
 author:
   - 'Jaldhar H. Vyas <jaldhar@braincells.com>'
-abstract: Perl extension for the Discordian Calendar
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
 license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Calendar-Discordian
+provides:
+  DateTime::Calendar::Discordian:
+    file: lib/DateTime/Calendar/Discordian.pm
+    version: v0.9.7
 requires:
   DateTime: 0
   DateTime::Locale: 0
   Params::Validate: 0
-provides:
-  DateTime::Calendar::Discordian:
-    file: lib/DateTime/Calendar/Discordian.pm
-    version: 0.9.6
-generated_by: Module::Build version 0.26
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.9.7

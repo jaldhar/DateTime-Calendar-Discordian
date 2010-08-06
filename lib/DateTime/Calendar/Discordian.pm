@@ -106,7 +106,7 @@ my %seasons = (
     },
 );
 
-my $tibsday = qr/s(?:ain)?t\.?\s*tib'?s?\s*(?:day)?/imx;
+my $tibsday = qr/s(?:ain)?t\.?\s*tib'?s?\s*(?:day)?/imsx;
 
 =head3 Days Of The Week
 
@@ -171,13 +171,14 @@ sub new {
 
     my %args = validate(
         @arguments,
-        {   day => {
+        {
+            day => {
                 type      => SCALAR,
                 default   => 0,
                 callbacks => {
                     q{between 1 and 73 or St. Tib's Day} => sub {
-                        ( $_[0] =~ /$tibsday/mx && !defined $_[1]->{season} )
-                            || ( $_[0] > 0 && $_[0] < 74 );
+                        ( $_[0] =~ /$tibsday/msx && !defined $_[1]->{season} )
+                          || ( $_[0] > 0 && $_[0] < 74 );
                     },
                 },
             },
@@ -186,8 +187,8 @@ sub new {
                 default   => 0,
                 callbacks => {
                     'valid season name' => sub {
-                        ( !defined( $_[0] ) && $_[1]->{day} =~ /$tibsday/mx )
-                            || scalar grep {/$_/imx} keys %seasons;
+                        ( !defined( $_[0] ) && $_[1]->{day} =~ /$tibsday/msx )
+                          || scalar grep { /$_/imsx } keys %seasons;
                     },
                 },
             },
@@ -213,14 +214,14 @@ sub new {
 
     if ( defined $args{season} ) {
         $args{season} = join q{ }, map { ucfirst lc $_ } split q{ },
-            $args{season};
+          $args{season};
     }
-    if ( $args{day} =~ /$tibsday/mx ) {
+    if ( $args{day} =~ /$tibsday/msx ) {
         $args{day} = q{St. Tib's Day};
     }
     croak q{Not a leap year}
-        if $args{day} eq q{St. Tib's Day}
-        && !_is_leap_year( $args{year} - 1166 );
+      if $args{day} eq q{St. Tib's Day}
+          && !_is_leap_year( $args{year} - 1166 );
     my $self = bless \%args, $class;
     $self->{epoch} = -426_237;
     $self->{fnord} = 5;
@@ -318,7 +319,8 @@ sub from_object {
     my ( $class, @arguments ) = @_;
     my %args = validate(
         @arguments,
-        {   object => {
+        {
+            object => {
                 type => OBJECT,
                 can  => 'utc_rd_values',
             },
@@ -344,7 +346,7 @@ sub from_object {
 
     $newobj->{rd_secs}     = $rd_secs     || 0;
     $newobj->{rd_nanosecs} = $rd_nanosecs || 0;
-    $newobj->{locale} = $args{locale};
+    $newobj->{locale}      = $args{locale};
 
     return $newobj;
 }
@@ -360,9 +362,9 @@ sub holyday {
     my ($self) = @_;
 
     return $seasons{ $self->{season} }->{apostle_holyday}
-        if ( $self->{day} == 5 );
+      if ( $self->{day} == 5 );
     return $seasons{ $self->{season} }->{season_holyday}
-        if ( $self->{day} == 50 );
+      if ( $self->{day} == 50 );
     return q{};
 }
 
@@ -492,11 +494,11 @@ my %formats = (
     'd'  => sub { $_[0]->day },
     'e'  => sub { _cardinal( $_[0]->{day} ) },
     'H'  => sub { $_[0]->holyday },
-    'n'  => sub {"\n"},
-    't'  => sub {"\t"},
+    'n'  => sub { "\n" },
+    't'  => sub { "\t" },
     'X'  => sub { $_[0]->days_till_x },
     'Y'  => sub { $_[0]->year },
-    q{%} => sub {q{%}},
+    q{%} => sub { q{%} },
     q{.} => sub { $_[0]->_randexcl },
 );
 
@@ -505,14 +507,14 @@ sub strftime {
 
     foreach (@r) {
         ( $self->{day} eq q{St. Tib's Day}
-                || ( $self->{day} != 5 && $self->{day} != 50 ) )
-            ? s/%N.+$//mx
-            : s/%N//gmx;
+              || ( $self->{day} != 5 && $self->{day} != 50 ) )
+          ? s/%N.+$//msx
+          : s/%N//gmsx;
         ( $self->{day} eq q{St. Tib's Day} )
-            ? s/%\{.+?%\}/%d/gmx
-            : s/%[{}]//gmx;
+          ? s/%\{.+?%\}/%d/gmsx
+          : s/%[{}]//gmsx;
 
-        s/%([%*A-Za-z])/ $formats{$1} ? $formats{$1}->($self) : $1 /egmx;
+        s/%([%*A-Za-z])/ $formats{$1} ? $formats{$1}->($self) : $1 /egmsx;
         if ( !wantarray ) {
             return $_;
         }
@@ -568,15 +570,15 @@ sub _discordian2rd {
     # Start with the epoch + number of elapsed days in intervening years.
     # Add number of intervening leap days.
     my $rd = 0    #
-        + 365 * ($yr)    #
-        + _floor( $yr / 4 )    #
-        - _floor( $yr / 100 ) + _floor( $yr / 400 );
+      + 365 * ($yr)    #
+      + _floor( $yr / 4 )    #
+      - _floor( $yr / 100 ) + _floor( $yr / 400 );
 
     # add number of days elapsed this year.
-    my $day_of_year
-        = $self->{day} eq q{St. Tib's Day}
-        ? 60
-        : $seasons{ $self->{season} }->{offset} + $self->{day};
+    my $day_of_year =
+      $self->{day} eq q{St. Tib's Day}
+      ? 60
+      : $seasons{ $self->{season} }->{offset} + $self->{day};
     $rd += $day_of_year;
 
     # add 1 if this is a leap year and it is past St. Tibs' Day.
@@ -624,10 +626,8 @@ sub _rd2discordian {
         $day    = q{St. Tib's Day};
     }
     else {
-        my @seas = (
-            'Chaos', 'Discord', 'Confusion', 'Bureaucracy',
-            'The Aftermath',
-        );
+        my @seas =
+          ( 'Chaos', 'Discord', 'Confusion', 'Bureaucracy', 'The Aftermath', );
         $season = $seas[ _floor( $d4 / 73 ) ];
 
         $day = $d4 - $seasons{$season}->{offset};

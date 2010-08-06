@@ -1,5 +1,8 @@
 Revision history for Perl extension DateTime::Calendar::Discordian.
 
+0.9.7 Fri Aug  6 14:00:49 EDT 2010
+    - Miscapitalization of days_till_x fixed in one place.
+    
 0.9.6 Thu Mar  6 07:39:24 2008
     - Fixed t/4-perl-critic.t so it deals properly with the absence of 
       Test::Perl::Critic.  Thanks to haoess and thospell on Perl Monks

@@ -4,7 +4,7 @@ Priority: optional
 Build-Depends: debhelper (>= 4.0.2), libmodule-build-perl
 Build-Depends-Indep: perl (>= 5.8.0-7), libdatetime-perl, libtest-perl-critic-perl, libtest-pod-coverage-perl (>= 1.08), libtest-pod-perl (>= 1.22)
 Maintainer: Jaldhar H. Vyas <jaldhar@debian.org>
-Standards-Version: 3.7.3
+Standards-Version: 3.9.1
 
 Package: libdatetime-calendar-discordian-perl
 Architecture: all

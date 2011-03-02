@@ -1,26 +1,29 @@
-This is the debian package for the DateTime::Calendar::Discordian module.
-It was created by Jaldhar H. Vyas <jaldhar@debian.org> using dh-make-perl.
+Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=135
+Maintainer: Jaldhar H. Vyas <jaldhar@braincells.com>
+Source: http://search.cpan.org/dist/DateTime-Calendar-Discordian/
+Name: CGI-Application-Plugin-TT
 
-The upstream author is: 
+Files: *
+Copyright (c) 2008 Consolidated Braincells Inc.
+License: Artistic or GPL-1+
 
-Jaldhar H. Vyas, <jaldhar@braincells.com>.
+Files: debian/*
+Copyright: 2010, Jaldhar H. Vyas <jaldhar@debian.org>
+License: Artistic or GPL-1+
 
-Copyright (c) 2003 Consolidated Braincells Inc.  All rights reserved.  
-This program is free software; you can redistribute it and/or modify it under 
-the same terms as Perl itself.
+License: Artistic
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the Artistic License, which comes with Perl.
+ .
+ On Debian systems, the complete text of the Artistic License
+ can be found in `/usr/share/common-licenses/Artistic'.
 
-      Copyright 1989-2001, Larry Wall  All rights reserved.
-
-      This program is free software; you can redistribute it and/or modify
-      it under the terms of either:
-
-      a) the GNU General Public License as published by the Free Software
-         Foundation; either version 1, or (at your option) any later
-         version, or
-
-      b) the "Artistic License" which comes with Perl.
-
-On Debian GNU/Linux systems, the complete text of the GNU General
-Public License can be found in `/usr/share/common-licenses/GPL' and
-the Artistic Licence in `/usr/share/common-licenses/Artistic'.
+License: GPL-1+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 1, or (at your option)
+ any later version.
+ .
+ On Debian systems, the complete text of version 1 of the
+ General Public License can be found in `/usr/share/common-licenses/GPL-1'.
 

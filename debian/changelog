@@ -2,9 +2,9 @@ libdatetime-calendar-discordian-perl (0.9.7-1) unstable; urgency=low
 
   * New upstream version. 
   * Miscapitalization of days_till_x fixed (Closes: #591910)
-  * Update packaging to policy 3.9.1 and debhelper 7/dh
+  * Update packaging to policy 3.9.1 and debhelper 8/dh
 
- -- Jaldhar H. Vyas <jaldhar@debian.org>  Mon, 09 Aug 2010 23:31:21 -0400
+ -- Jaldhar H. Vyas <jaldhar@debian.org>  Tue, 01 Mar 2011 23:23:59 -0500
 
 libdatetime-calendar-discordian-perl (0.9.6-1) unstable; urgency=low
 

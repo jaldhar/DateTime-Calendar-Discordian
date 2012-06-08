@@ -6,5 +6,6 @@ severity = brutal
 
 [-Documentation::PodSpelling]
 
-[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-Miscellanea::RequireRcsKeywords]
 
+[-ValuesAndExpressions::ProhibitMagicNumbers]

@@ -1,4 +1,3 @@
-# $Id$
 
 =head1 NAME
 
@@ -20,17 +19,18 @@ package DateTime::Calendar::Discordian;
 
 use strict;
 use warnings;
+use 5.010;
 use Carp;
 use DateTime::Locale;
 use Params::Validate qw( validate SCALAR OBJECT UNDEF);
 
 =head1 VERSION
 
-This document describes DateTime::Calendar::Discordian version 0.9.7
+This document describes DateTime::Calendar::Discordian version 1.0
 
 =cut
 
-our $VERSION = '0.9.7';
+our $VERSION = '1.0';
 
 =head1 DESCRIPTION
 
@@ -38,27 +38,29 @@ our $VERSION = '0.9.7';
 
 =head3 Seasons 
 
-	Name		Patron apostle
-	----		--------------
-	Chaos		Hung Mung
-	Discord		Dr. Van Van Mojo
-	Confusion	Sri Syadasti
-	Bureaucracy	Zarathud
-	The Aftermath	The Elder Malaclypse
+	Name            Patron apostle
+	----            --------------
+	Chaos           Hung Mung
+	Discord         Dr. Van Van Mojo
+	Confusion       Sri Syadasti
+	Bureaucracy	    Zarathud
+	The Aftermath   The Elder Malaclypse
+
+Each season contains 73 consecutively numbered days.
 
 =head3 Holydays
 
-	Apostle Holydays	Season Holydays
-	----------------	---------------
-	1) Mungday		1) Chaoflux
-	2) Mojoday		2) Discoflux
-	3) Syaday		3) Confuflux
-	4) Zaraday		4) Bureflux
-	5) Maladay		5) Afflux
+	Apostle Holydays    Season Holydays
+	----------------    ---------------
+	1) Mungday          1) Chaoflux
+	2) Mojoday          2) Discoflux
+	3) Syaday           3) Confuflux
+	4) Zaraday          4) Bureflux
+	5) Maladay          5) Afflux
 
-Apostle Holydays occur on the 5th day of the Season. 
+Apostle Holydays occur on the 5th day of the season.
 
-Season Holydays occur on the 50th day of the Season. 
+Season Holydays occur on the 50th day of the deason.
 
 St. Tib's Day occurs once every 4 years (1+4=5) and is inserted between
 the 59th and 60th days of the Season of Chaos. 
@@ -106,7 +108,7 @@ my %seasons = (
     },
 );
 
-my $tibsday = qr/s(?:ain)?t\.?\s*tib'?s?\s*(?:day)?/imsx;
+my $tibsday = qr/s(?:ain)?t[.]?\s*tib'?s?\s*(?:day)?/imsx;
 
 =head3 Days Of The Week
 
@@ -164,6 +166,9 @@ parameters are given.  For example:
 my $dtcd = DateTime::Calendar::Discordian->new(
   day => 8, season => 'Discord', year => 3137, );
 
+The I<second>, I<nanosecond>, and I<locale> parameters are also accepted for
+compatability with L<DateTime|DateTime> but nothing is done with them.
+
 =cut
 
 sub new {
@@ -173,40 +178,40 @@ sub new {
         @arguments,
         {
             day => {
-                type      => SCALAR,
-                default   => 0,
                 callbacks => {
                     q{between 1 and 73 or St. Tib's Day} => sub {
-                        ( $_[0] =~ /$tibsday/msx && !defined $_[1]->{season} )
-                          || ( $_[0] > 0 && $_[0] < 74 );
+                        my ( $day, $opts ) = @_;
+                        if ( $day =~ $tibsday ) {
+                            if ( !defined $opts->{season} ) {
+                                return 1;
+                            }
+                        }
+                        elsif ( $day > 0 && $day < 74 ) {
+                            return 1;
+                        }
+                        return;
                     },
                 },
             },
             season => {
-                type      => SCALAR | UNDEF,
-                default   => 0,
+                default   => undef,
                 callbacks => {
                     'valid season name' => sub {
-                        ( !defined( $_[0] ) && $_[1]->{day} =~ /$tibsday/msx )
-                          || scalar grep { /$_/imsx } keys %seasons;
+                        my ( $season, $opts ) = @_;
+                        if ( defined $season ) {
+                            return scalar grep { /((?-x)$season)/imsx }
+                              keys %seasons;
+                        }
+                        return 1;
                     },
                 },
             },
-            year => {
-                type    => SCALAR,
-                default => 0,
-            },
-            rd_secs => {
-                type    => SCALAR,
-                default => 0,
-            },
-            rd_nanosecs => {
-                type    => SCALAR,
-                default => 0,
-            },
-            locale => {
-                type    => SCALAR | OBJECT | UNDEF,
-                default => undef,
+            year       => { type    => SCALAR, },
+            second     => { default => 0, },
+            nanosecond => { default => 0, },
+            locale     => {
+                type     => SCALAR | OBJECT | UNDEF,
+                optional => 1,
             },
 
         }
@@ -216,7 +221,12 @@ sub new {
         $args{season} = join q{ }, map { ucfirst lc $_ } split q{ },
           $args{season};
     }
-    if ( $args{day} =~ /$tibsday/msx ) {
+    else {
+        if ( $args{day} !~ $tibsday ) {
+            confess 'missing season';
+        }
+    }
+    if ( $args{day} =~ $tibsday ) {
         $args{day} = q{St. Tib's Day};
     }
     croak q{Not a leap year}
@@ -339,14 +349,13 @@ sub from_object {
     my ( $day, $season, $year ) = $class->_rd2discordian($rd_days);
 
     my $newobj = $class->new(
-        day    => $day,
-        season => $season,
-        year   => $year,
+        day        => $day,
+        season     => $season,
+        year       => $year,
+        second     => $rd_secs,
+        nanosecond => $rd_nanosecs,
+        locale     => $args{locale},
     );
-
-    $newobj->{rd_secs}     = $rd_secs     || 0;
-    $newobj->{rd_nanosecs} = $rd_nanosecs || 0;
-    $newobj->{locale}      = $args{locale};
 
     return $newobj;
 }
@@ -397,9 +406,9 @@ sub season_name {
 This function takes one or more parameters consisting of strings
 containing special specifiers.  For each such string it will return a
 string formatted according to the specifiers, er, specified.  See the
-L<strftime Specifiers|/strftime Specifiers> section for a list of the
+L<strftime Specifiers|/"strftime Specifiers"> section for a list of the
 available format specifiers.  They have been chosen to be compatible
-with the L<ddate(1)> program not necessarily the L<strftime(3)> C
+with the L<ddate(1)|ddate/1> program not necessarily the L<strftime(3)|strftime/3> C
 function.  If you give a format specifier that doesn't exist, then it is
 simply treated as text.
 
@@ -511,10 +520,10 @@ sub strftime {
           ? s/%N.+$//msx
           : s/%N//gmsx;
         ( $self->{day} eq q{St. Tib's Day} )
-          ? s/%\{.+?%\}/%d/gmsx
+          ? s/%[{].+?%[}]/%d/gmsx
           : s/%[{}]//gmsx;
 
-        s/%([%*A-Za-z])/ $formats{$1} ? $formats{$1}->($self) : $1 /egmsx;
+        s/%([%*[:alpha:]])/ $formats{$1} ? $formats{$1}->($self) : $1 /egmsx;
         if ( !wantarray ) {
             return $_;
         }
@@ -525,14 +534,14 @@ sub strftime {
 =head2 utc_rd_values
 
 Returns a three-element array containing the current UTC RD days,
-seconds, and nanoseconds.  See L<DateTime> for more details.
+seconds, and nanoseconds.  See L<DateTime|DateTime> for more details.
 
 =cut
 
 sub utc_rd_values {
     my ($self) = @_;
 
-    return ( $self->{rd}, $self->{rd_secs}, $self->{rd_nanosecs} || 0 );
+    return ( $self->{rd}, $self->{rd_secs}, $self->{rd_nanosecs} );
 }
 
 =head2 year
@@ -618,7 +627,13 @@ sub _rd2discordian {
     my $n1   = _floor( $d3 / 365 );
     my $d4   = $d3 % 365;
 
-    my $year = ( 400 * $n400 ) + ( 100 * $n100 ) + ( 4 * $n4 ) + $n1 + 1167;
+    # $d4 == 0 is the last day of the year so has to be special cased.
+    my $year =
+      ( 400 * $n400 ) +
+      ( 100 * $n100 ) +
+      ( 4 * $n4 ) +
+      $n1 + 1166 +
+      ( ( $d4 == 0 ) ? 0 : 1 );
 
     my ( $season, $day );
     if ( $d4 == 60 && _is_leap_year( $year - 1166 ) ) {
@@ -628,9 +643,9 @@ sub _rd2discordian {
     else {
         my @seas =
           ( 'Chaos', 'Discord', 'Confusion', 'Bureaucracy', 'The Aftermath', );
-        $season = $seas[ _floor( $d4 / 73 ) ];
+        $season = ( $d4 == 0 ) ? $seas[4] : $seas[ _floor( $d4 / 73 ) ];
 
-        $day = $d4 - $seasons{$season}->{offset};
+        $day = ( $d4 == 0 ) ? 73 : $d4 - $seasons{$season}->{offset};
 
         if ( $d4 > 60 && _is_leap_year( $year - 1166 ) ) {
             $day--;
@@ -649,12 +664,28 @@ __END__
 
 =head1 SUPPORT
 
-Support for this module is provided via the datetime@perl.org email
-list. See L<http://lists.perl.org/> for more details.
+After installing, you can find documentation for this module with the perldoc
+command.
 
-Please submit bugs to the CPAN RT system at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=datetime-Calendar-Discordian>
+    perldoc DateTime::Calendar::Discordian
+
+Support for this module is provided via the datetime@perl.org email list. See
+L<lists.perl.org|http://lists.perl.org/> for more details.
+
+Please submit bugs to the L<CPAN RT system|http://rt.cpan.org/NoAuth/ReportBug.html?Queue=datetime-Calendar-Discordian>
 or via email at bug-datetime-calendar-discordian@rt.cpan.org.
+
+You can also look for information at:
+
+=over 4
+
+=item * L<Search CPAN.|http://search.cpan.org/dist/DateTime-Calendar-Discordian>
+
+=item * L<AnnoCPAN, annotated CPAN documentation.|http://annocpan.org/dist/DateTime-Calendar-Discordian>
+
+=item * L<CPAN Ratings.|http://cpanratings.perl.org/d/DateTime-Calendar-Discordian>
+
+=back
 
 =head1 AUTHOR
 
@@ -662,20 +693,29 @@ Jaldhar H. Vyas, E<lt>jaldhar@braincells.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008, Consolidated Braincells Inc.
+Copyright (C) 2012, Consolidated Braincells Inc.
 
-This library is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+This distribution is free software; you can redistribute it and/or modify it
+under the terms of either:
+
+a) the GNU General Public License as published by the Free Software
+Foundation; either version 2, or (at your option) any later version, or
+
+b) the Artistic License version 2.0.
 
 The full text of the license can be found in the LICENSE file included
-with this module.
+with this distribution.
 
 =head1 SEE ALSO
 
-L<http://datetime.perl.org/> -- The DateTime project web site.
+=over 4
 
-L<http://www.ology.org/principia/> -- The Principia Discordia.
+=item * L<The DateTime project web site.|http://datetime.perl.org/>
 
-L<http://www.subgenius.com/> -- The Church of the SubGenius.
+=item * L<The Principia Discordia.|http://www.ology.org/principia/>
+
+=item * L<The Church of the SubGenius.|http://www.subgenius.com/>
+
+=back
 
 =cut

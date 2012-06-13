@@ -1,14 +1,14 @@
-Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=135
-Maintainer: Jaldhar H. Vyas <jaldhar@braincells.com>
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: DateTime-Calendar-Discordian
+Upstream-Contact: Jaldhar H. Vyas <jaldhar@braincells.com>
 Source: http://search.cpan.org/dist/DateTime-Calendar-Discordian/
-Name: CGI-Application-Plugin-TT
 
 Files: *
-Copyright (c) 2008 Consolidated Braincells Inc.
+Copyright: (c) 2012, Consolidated Braincells Inc.
 License: Artistic or GPL-1+
 
 Files: debian/*
-Copyright: 2010, Jaldhar H. Vyas <jaldhar@debian.org>
+Copyright: (c) 2012, Jaldhar H. Vyas <jaldhar@debian.org>
 License: Artistic or GPL-1+
 
 License: Artistic

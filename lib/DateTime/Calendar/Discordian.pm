@@ -38,29 +38,29 @@ our $VERSION = '1.0';
 
 =head3 Seasons 
 
-	Name            Patron apostle
-	----            --------------
-	Chaos           Hung Mung
-	Discord         Dr. Van Van Mojo
-	Confusion       Sri Syadasti
-	Bureaucracy	    Zarathud
-	The Aftermath   The Elder Malaclypse
+    Name            Patron Apostle
+    ----            --------------
+    Chaos           Hung Mung
+    Discord         Dr. Van Van Mojo
+    Confusion       Sri Syadasti
+    Bureaucracy     Zarathud
+    The Aftermath   The Elder Malaclypse
 
 Each season contains 73 consecutively numbered days.
 
 =head3 Holydays
 
-	Apostle Holydays    Season Holydays
-	----------------    ---------------
-	1) Mungday          1) Chaoflux
-	2) Mojoday          2) Discoflux
-	3) Syaday           3) Confuflux
-	4) Zaraday          4) Bureflux
-	5) Maladay          5) Afflux
+    Apostle Holydays    Season Holydays
+    ----------------    ---------------
+    1) Mungday          1) Chaoflux
+    2) Mojoday          2) Discoflux
+    3) Syaday           3) Confuflux
+    4) Zaraday          4) Bureflux
+    5) Maladay          5) Afflux
 
 Apostle Holydays occur on the 5th day of the season.
 
-Season Holydays occur on the 50th day of the deason.
+Season Holydays occur on the 50th day of the season.
 
 St. Tib's Day occurs once every 4 years (1+4=5) and is inserted between
 the 59th and 60th days of the Season of Chaos. 
@@ -112,11 +112,11 @@ my $tibsday = qr/s(?:ain)?t[.]?\s*tib'?s?\s*(?:day)?/imsx;
 
 =head3 Days Of The Week
 
-	1. Sweetmorn 
-	2. Boomtime 
-	3. Pungenday 
-	4. Prickle-Prickle 
-	5. Setting Orange 
+    1. Sweetmorn
+    2. Boomtime
+    3. Pungenday
+    4. Prickle-Prickle
+    5. Setting Orange
 
 The days of the week are named from the five Basic Elements: sweet,
 boom, pungent, prickle and orange.

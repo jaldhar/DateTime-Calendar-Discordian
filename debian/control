@@ -1,15 +1,21 @@
 Source: libdatetime-calendar-discordian-perl
 Section: perl
 Priority: optional
-Build-Depends: debhelper (>= 8)
-Build-Depends-Indep: perl (>= 5.10.0), libdatetime-perl
 Maintainer: Jaldhar H. Vyas <jaldhar@debian.org>
-Standards-Version: 3.9.3
+Build-Depends: debhelper (>= 9)
+Build-Depends-Indep: libdatetime-locale-perl,
+ libdatetime-perl,
+ libparams-validate-perl,
+ perl (>= 5.13.11)
+Standards-Version: 3.9.6
 
 Package: libdatetime-calendar-discordian-perl
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, libdatetime-locale-perl, libparams-validate-perl
-Description:  Perl extension for the Discordian Calendar
+Depends: ${misc:Depends}, ${perl:Depends},
+ libdatetime-locale-perl,
+ libdatetime-perl,
+ libparams-validate-perl
+Description: Perl extension for the Discordian Calendar
  This is a module that implements the Discordian calendar made popular
  in the "Illuminatus!" trilogy by Robert Shea and Robert Anton Wilson and
  the Church of the SubGenius.  It follows the DateTime API.

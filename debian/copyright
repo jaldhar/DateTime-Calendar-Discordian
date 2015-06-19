@@ -1,22 +1,22 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: DateTime-Calendar-Discordian
+Source: https://metacpan.org/release/DateTime-Calendar-Discordian
 Upstream-Contact: Jaldhar H. Vyas <jaldhar@braincells.com>
-Source: http://search.cpan.org/dist/DateTime-Calendar-Discordian/
+Upstream-Name: DateTime-Calendar-Discordian
 
 Files: *
 Copyright: (c) 2012, Consolidated Braincells Inc.
 License: Artistic or GPL-1+
 
 Files: debian/*
-Copyright: (c) 2012, Jaldhar H. Vyas <jaldhar@debian.org>
+Copyright: 2004, 2006, 2008, 2011, 2012, 2015, Jaldhar H. Vyas <jaldhar@debian.org>
 License: Artistic or GPL-1+
 
 License: Artistic
  This program is free software; you can redistribute it and/or modify
  it under the terms of the Artistic License, which comes with Perl.
  .
- On Debian systems, the complete text of the Artistic License
- can be found in `/usr/share/common-licenses/Artistic'.
+ On Debian systems, the complete text of the Artistic License can be
+ found in `/usr/share/common-licenses/Artistic'.
 
 License: GPL-1+
  This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,5 @@ License: GPL-1+
  the Free Software Foundation; either version 1, or (at your option)
  any later version.
  .
- On Debian systems, the complete text of version 1 of the
- General Public License can be found in `/usr/share/common-licenses/GPL-1'.
-
+ On Debian systems, the complete text of version 1 of the GNU General
+ Public License can be found in `/usr/share/common-licenses/GPL-1'.

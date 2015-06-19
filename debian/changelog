@@ -1,3 +1,12 @@
+libdatetime-calendar-discordian-perl (1.0-2) unstable; urgency=medium
+
+  * Added build-dependency on libmodule-build-perl as Module::Build is no
+    longer included in recent Perl versions.
+    (Closes: #789143)
+  * Brought some other debian files up to date.
+
+ -- Jaldhar H. Vyas <jaldhar@debian.org>  Fri, 19 Jun 2015 15:46:12 -0400
+
 libdatetime-calendar-discordian-perl (1.0-1) unstable; urgency=low
 
   * New upstream version.
